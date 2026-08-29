@@ -1,0 +1,9 @@
+numpy
+pandas
+requests
+python-dotenv
+scipy
+scikit-learn
+matplotlib
+tabulate
+fpdf2

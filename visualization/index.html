@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agentic AI Driven Build Stability Prediction — Interactive Research Demo</title>
+<style>
+:root{
+  --bg:#0a0f1e; --bg2:#0e1630; --card:#131c36; --card2:#182348;
+  --line:#233156; --txt:#e8edf7; --muted:#8fa0c2; --dim:#5c6d92;
+  --teal:#14b8a6; --sky:#38bdf8; --amber:#f59e0b; --rose:#fb7185;
+  --violet:#a78bfa; --green:#34d399; --red:#f87171;
+  --mono:'SF Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;line-height:1.55;overflow-x:hidden}
+a{color:var(--sky);text-decoration:none}
+/* ---------- nav ---------- */
+nav{position:sticky;top:0;z-index:100;display:flex;align-items:center;gap:4px;padding:10px 22px;
+  background:rgba(10,15,30,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);flex-wrap:wrap}
+nav .brand{font-weight:800;font-size:14px;margin-right:14px;letter-spacing:.4px}
+nav .brand span{color:var(--teal)}
+nav a.link{font-size:12.5px;color:var(--muted);padding:6px 11px;border-radius:8px;transition:.2s}
+nav a.link:hover{color:var(--txt);background:var(--card2)}
+nav .live-dot{margin-left:auto;font-size:11.5px;color:var(--green);display:flex;align-items:center;gap:6px;font-family:var(--mono)}
+nav .live-dot i{width:8px;height:8px;border-radius:50%;background:var(--green);animation:pulse 1.6s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,211,153,.5)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(52,211,153,0)}}
+/* ---------- hero ---------- */
+.hero{position:relative;padding:72px 24px 46px;text-align:center;overflow:hidden;
+  background:radial-gradient(1100px 480px at 50% -10%,rgba(20,184,166,.16),transparent),
+             radial-gradient(800px 400px at 85% 10%,rgba(56,189,248,.10),transparent),
+             radial-gradient(700px 380px at 12% 16%,rgba(167,139,250,.10),transparent)}
+.hero .tag{display:inline-block;font-size:11.5px;font-family:var(--mono);color:var(--teal);
+  border:1px solid rgba(20,184,166,.4);border-radius:999px;padding:5px 14px;margin-bottom:18px;background:rgba(20,184,166,.07)}
+.hero h1{font-size:clamp(26px,4.2vw,44px);font-weight:850;line-height:1.16;max-width:960px;margin:0 auto}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--teal),var(--sky));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p.sub{color:var(--muted);max-width:760px;margin:16px auto 0;font-size:15.5px}
+.kpis{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:34px}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 22px;min-width:150px;transition:.25s}
+.kpi:hover{transform:translateY(-3px);border-color:var(--teal)}
+.kpi .v{font-size:27px;font-weight:800;font-family:var(--mono)}
+.kpi .l{font-size:11.5px;color:var(--muted);margin-top:3px}
+/* animated conveyor */
+.conveyor{margin:40px auto 0;max-width:900px;height:64px;position:relative;border:1px dashed var(--line);border-radius:12px;overflow:hidden;background:rgba(19,28,54,.5)}
+.conveyor .lbl{position:absolute;top:4px;left:10px;font-size:10px;font-family:var(--mono);color:var(--dim);letter-spacing:1px}
+.chip{position:absolute;top:26px;padding:4px 10px;border-radius:8px;font-family:var(--mono);font-size:11px;white-space:nowrap;
+  animation:slide 9s linear infinite;border:1px solid}
+@keyframes slide{from{left:-180px}to{left:105%}}
+.chip.pass{background:rgba(52,211,153,.12);border-color:rgba(52,211,153,.5);color:var(--green)}
+.chip.fail{background:rgba(248,113,113,.12);border-color:rgba(248,113,113,.5);color:var(--red)}
+.chip.warn{background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.5);color:var(--amber)}
+/* ---------- layout ---------- */
+section{max-width:1180px;margin:0 auto;padding:58px 24px 12px}
+.sec-tag{font-family:var(--mono);font-size:12px;color:var(--teal);letter-spacing:1.5px;text-transform:uppercase}
+h2{font-size:clamp(21px,2.6vw,30px);font-weight:800;margin:6px 0 8px}
+p.lead{color:var(--muted);max-width:860px;font-size:14.5px;margin-bottom:26px}
+.grid{display:grid;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px}
+.card h3{font-size:15px;font-weight:700;margin-bottom:4px}
+.card .hint{font-size:12px;color:var(--dim);margin-bottom:14px}
+/* ---------- pipeline flow ---------- */
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.stage{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;cursor:pointer;transition:.2s;position:relative}
+.stage:hover,.stage.active{border-color:var(--sky);transform:translateY(-3px)}
+.stage .num{font-family:var(--mono);font-size:11px;color:var(--sky)}
+.stage b{display:block;margin:4px 0 6px;font-size:14.5px}
+.stage code{display:block;font-family:var(--mono);font-size:10.5px;color:var(--muted);padding:2px 0}
+.stage:after{content:"→";position:absolute;right:-15px;top:44%;color:var(--dim);font-size:16px;z-index:2}
+.stage:last-child:after{content:""}
+#flow-detail{margin-top:14px;border-left:3px solid var(--sky);background:var(--card2);border-radius:0 12px 12px 0;padding:14px 18px;font-size:13.5px;color:var(--muted);min-height:52px}
+/* ---------- prisma ---------- */
+.prisma-wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:20px}
+.funnel-stage{cursor:pointer;margin:0 auto 10px;border-radius:10px;padding:11px 14px;display:flex;justify-content:space-between;align-items:center;
+  border:1px solid;transition:.25s;font-size:13px}
+.funnel-stage:hover{transform:scale(1.025)}
+.funnel-stage .n{font-family:var(--mono);font-weight:800;font-size:17px}
+#prisma-detail{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:18px;font-size:13.5px;color:var(--muted)}
+#prisma-detail b{color:var(--txt)}
+/* ---------- charts ---------- */
+.bar-row{display:grid;grid-template-columns:150px 1fr 62px;align-items:center;gap:10px;margin:9px 0;font-size:12.5px}
+.bar-row .name{font-family:var(--mono);font-size:11.5px;color:var(--muted);text-align:right}
+.bar-track{height:20px;background:rgba(35,49,86,.55);border-radius:6px;position:relative;overflow:visible}
+.bar-fill{height:100%;border-radius:6px;width:0;transition:width 1.1s cubic-bezier(.2,.8,.2,1);position:relative}
+.bar-val{font-family:var(--mono);font-size:11.5px;color:var(--txt)}
+.toggle{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.toggle button{background:none;border:0;color:var(--muted);font-size:12px;padding:7px 14px;cursor:pointer;font-family:inherit}
+.toggle button.on{background:var(--card2);color:var(--txt);font-weight:700}
+.sig{display:inline-block;padding:1px 7px;border-radius:99px;font-size:10px;font-family:var(--mono);margin-left:6px}
+/* donut + gauge */
+svg text{font-family:var(--mono)}
+/* ---------- sliders ---------- */
+.sliders label{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);margin:14px 0 5px}
+.sliders label output{font-family:var(--mono);color:var(--txt);font-weight:700}
+input[type=range]{width:100%;-webkit-appearance:none;height:6px;border-radius:4px;background:var(--line);outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:17px;height:17px;border-radius:50%;background:var(--teal);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 1px var(--teal)}
+.risk-stack{display:flex;height:26px;border-radius:8px;overflow:hidden;margin-top:12px;border:1px solid var(--line)}
+.risk-stack div{transition:width .4s;display:flex;align-items:center;justify-content:center;font-size:9px;font-family:var(--mono);color:#04121f;overflow:hidden;white-space:nowrap}
+.action-badge{margin-top:16px;border-radius:12px;padding:13px 16px;font-family:var(--mono);font-size:13px;font-weight:700;border:1px solid;transition:.3s}
+.action-desc{font-size:11.5px;font-weight:400;margin-top:4px;opacity:.85}
+/* ---------- agent sim ---------- */
+.sim-grid{display:grid;grid-template-columns:1.35fr 1fr;gap:16px}
+.console{background:#070b16;border:1px solid var(--line);border-radius:12px;font-family:var(--mono);font-size:11.5px;
+  height:330px;overflow-y:auto;padding:14px}
+.console .ln{margin:2px 0;white-space:pre-wrap;animation:fadein .3s}
+@keyframes fadein{from{opacity:0;transform:translateY(3px)}to{opacity:1}}
+.console .t{color:var(--dim)}
+.console .agent{color:var(--violet)}
+.console .ok{color:var(--green)} .console .bad{color:var(--red)} .console .wrn{color:var(--amber)} .console .inf{color:var(--sky)}
+.sim-controls{display:flex;gap:8px;margin:12px 0}
+.btn{background:var(--card2);color:var(--txt);border:1px solid var(--line);border-radius:9px;padding:8px 16px;font-size:12.5px;cursor:pointer;font-family:inherit;transition:.2s}
+.btn:hover{border-color:var(--teal)}
+.btn.primary{background:var(--teal);color:#04231f;font-weight:800;border-color:var(--teal)}
+.counter-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.counter{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:11px 13px}
+.counter .cv{font-family:var(--mono);font-size:21px;font-weight:800}
+.counter .cl{font-size:10.5px;color:var(--muted)}
+.dist-row{display:grid;grid-template-columns:118px 1fr 34px;gap:8px;align-items:center;font-size:10.5px;font-family:var(--mono);margin:7px 0}
+.dist-track{height:13px;border-radius:5px;background:rgba(35,49,86,.55);overflow:hidden}
+.dist-fill{height:100%;border-radius:5px;transition:width .5s}
+/* architecture svg */
+.arch-node{cursor:pointer}
+.arch-node rect{transition:.25s}
+.arch-node:hover rect{filter:brightness(1.4)}
+.dashflow{stroke-dasharray:6 6;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-12}}
+#arch-detail{margin-top:12px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:14px 18px;font-size:13px;color:var(--muted);min-height:48px}
+/* taxonomy chips */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.tax{border:1px solid var(--line);border-radius:10px;padding:8px 13px;font-size:12px;cursor:pointer;transition:.2s;background:var(--card)}
+.tax:hover{transform:translateY(-2px)}
+/* trace table */
+table{width:100%;border-collapse:collapse;font-size:12.5px}
+th{color:var(--dim);text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:1px;padding:9px 12px;border-bottom:1px solid var(--line)}
+td{padding:9px 12px;border-bottom:1px solid rgba(35,49,86,.5);color:var(--muted)}
+td code{font-family:var(--mono);font-size:11px;color:var(--sky)}
+tr:hover td{background:rgba(24,35,72,.5)}
+footer{text-align:center;color:var(--dim);font-size:12px;padding:44px 20px 34px}
+.reveal{opacity:0;transform:translateY(22px);transition:.7s cubic-bezier(.2,.8,.2,1)}
+.reveal.in{opacity:1;transform:none}
+@media(max-width:900px){.flow{grid-template-columns:1fr 1fr}.stage:after{display:none}
+ .prisma-wrap,.sim-grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="brand">thesis-poc <span>· agentic build stability</span></div>
+  <a class="link" href="#pipeline">Pipeline</a>
+  <a class="link" href="#obj1">Objective 1 · Evidence</a>
+  <a class="link" href="#obj2">Objective 2 · Models</a>
+  <a class="link" href="#obj3">Objective 3 · Metric</a>
+  <a class="link" href="#obj4">Objective 4 · Agent</a>
+  <a class="link" href="#trace">Traceability</a>
+  <div class="live-dot"><i></i>DEMO LIVE</div>
+</nav>
+
+<!-- ================= HERO ================= -->
+<div class="hero">
+  <div class="tag">PhD Research POC · Manipal University Jaipur · SDLC Analytics</div>
+  <h1>Agentic AI Driven <em>Continuous Build Stability Prediction</em> in the SDLC</h1>
+  <p class="sub">An interactive walkthrough of the working research pipeline: from a systematic review of 397 records,
+  through a harmonized public GitHub Actions corpus and statistical evidence, to a live agent that scores every build and decides what the pipeline should do next.</p>
+  <div class="kpis">
+    <div class="kpi"><div class="v" style="color:var(--teal)" data-count="397">0</div><div class="l">records screened</div></div>
+    <div class="kpi"><div class="v" style="color:var(--sky)" data-count="18">0</div><div class="l">primary studies kept</div></div>
+    <div class="kpi"><div class="v" style="color:var(--green)" data-count="37">0</div><div class="l">works cited</div></div>
+    <div class="kpi"><div class="v" style="color:var(--amber)" data-count="3000">0</div><div class="l">harmonized builds</div></div>
+    <div class="kpi"><div class="v" style="color:var(--violet)" data-count="6160" data-fmt="auc">0</div><div class="l">baseline ROC-AUC</div></div>
+    <div class="kpi"><div class="v" style="color:var(--rose)" data-count="1297" data-fmt="pct">0</div><div class="l">failure proportion</div></div>
+  </div>
+  <div class="conveyor" id="conveyor"><span class="lbl">INCOMING CI/CD BUILD STREAM</span></div>
+</div>
+
+<!-- ================= PIPELINE ================= -->
+<section id="pipeline" class="reveal">
+  <div class="sec-tag">Reproducible research pipeline</div>
+  <h2>Four executable phases, every artifact traceable to code</h2>
+  <p class="lead">The manuscript's core claim is that credible prediction starts at the measurement layer.
+  This repository implements that claim: each phase below is a runnable module, and each number in the paper is generated — not typed in. Click a stage.</p>
+  <div class="flow" id="flow"></div>
+  <div id="flow-detail">Select a phase to see what it does and which files implement it.</div>
+</section>
+
+<!-- ================= OBJECTIVE 1 ================= -->
+<section id="obj1" class="reveal">
+  <div class="sec-tag">Objective 1 · datasets &amp; parameter-outcome evidence</div>
+  <h2>What the evidence says — literature and corpus, side by side</h2>
+  <p class="lead">The review distilled 397 candidate records into 18 auditable primary studies, positioned inside a 37-work bibliography that spans
+  CI/CD foundations, methodology anchors (PRISMA 2020, ROC-AUC caveats) and the field's newest evidence threads. The empirical track then tested whether the review's
+  dataset rules survive contact with real GitHub Actions traces. On the frozen 3,000-run snapshot, process-intensity fields (`duration_sec`, `run_attempt`) carry the significant associations; change-scope fields do not.</p>
+
+  <div class="prisma-wrap">
+    <div class="card">
+      <h3>PRISMA-style screening funnel</h3>
+      <div class="hint">Click each stage — the gates are quality filters, not sampling targets</div>
+      <div id="funnel"></div>
+    </div>
+    <div>
+      <div id="prisma-detail"><b>Identification — 397 records.</b><br>Scoped search of indexed scholarly sources (2017–2025) using keyword families around continuous integration/deployment, build failure prediction and build stability analytics. Everything that matched entered the funnel before any filtering.</div>
+      <div class="card" style="margin-top:16px">
+        <h3>Parameter taxonomy from the synthesis</h3>
+        <div class="hint">Five families found across the 18 studies — hover / tap</div>
+        <div class="chips" id="taxonomy"></div>
+        <div id="tax-detail" style="font-size:12.5px;color:var(--muted);margin-top:12px;min-height:40px">The taxonomy organizes every feature reported in the literature into five groups, so parameter-outcome findings can be compared across toolchains.</div>
+      </div>
+      <div class="card" style="margin-top:16px">
+        <h3>New evidence threads in the 37-work bibliography</h3>
+        <div class="hint">Where the field is heading — each thread is cited and positioned in the manuscript</div>
+        <div class="chips" id="threads"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid" style="grid-template-columns:1.5fr 1fr;margin-top:16px">
+    <div class="card">
+      <h3>Parameter → failure association (harmonized corpus, N=3000)</h3>
+      <div class="hint">Frozen snapshot values from <span style="font-family:var(--mono)">outputs/objective1_real/parameter_association.csv</span> — hover bars for p-values</div>
+      <div class="toggle">
+        <button class="on" onclick="setChart('corr',this)">Point-biserial correlation</button>
+        <button onclick="setChart('coef',this)">Logistic coefficients</button>
+        <button onclick="setChart('rf',this)">Abs. correlation</button>
+      </div>
+      <div id="assoc-chart"></div>
+      <div style="font-size:11px;color:var(--dim);margin-top:10px">Process intensity (<span style="font-family:var(--mono)">duration_sec</span>, <span style="font-family:var(--mono)">run_attempt</span>) is Holm-significant on this snapshot. Change-scope fields are not.</div>
+    </div>
+    <div class="card">
+      <h3>Class balance — reported, not hidden</h3>
+      <div class="hint">Failure proportion 0.1297 · imbalance-aware reporting</div>
+      <div style="display:flex;justify-content:center"><svg id="donut" width="220" height="220" viewBox="0 0 220 220"></svg></div>
+      <div style="display:flex;justify-content:space-around;font-size:12px;margin-top:6px">
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--green);margin-right:5px"></i>2611 pass</span>
+        <span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:var(--red);margin-right:5px"></i>389 fail</span>
+      </div>
+      <div style="font-size:11.5px;color:var(--dim);margin-top:12px">Failure is the minority class but the operationally expensive one — so the snapshot reports failure-class precision (0.733), recall (0.094) and F1 (0.167), never accuracy alone.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OBJECTIVE 2 ================= -->
+<section id="obj2" class="reveal">
+  <div class="sec-tag">Objective 2 · model design (POC)</div>
+  <h2>Baseline models confirm the signal is modest on real CI traces</h2>
+  <p class="lead">The frozen Objective 1 snapshot is a standardized logistic regression on the 3,000-run GitHub Actions corpus.
+  Accuracy is high because most runs succeed; failure recall is the metric that matters operationally. Objective 2 is a starter Random Forest POC and was not re-fit on this snapshot.</p>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="card">
+      <h3 style="color:var(--teal)">Logistic Regression <span style="font-size:10.5px;color:var(--dim);font-weight:400">· objective 1 frozen snapshot</span></h3>
+      <div class="hint">Standardized features · stratified 30% holdout, seed 42</div>
+      <div class="bar-row"><span class="name">ROC-AUC</span><div class="bar-track"><div class="bar-fill mfill" data-w="61.60" style="background:linear-gradient(90deg,var(--teal),var(--sky))"></div></div><span class="bar-val">0.6160</span></div>
+      <div class="bar-row"><span class="name">Accuracy</span><div class="bar-track"><div class="bar-fill mfill" data-w="87.78" style="background:linear-gradient(90deg,var(--teal),var(--sky))"></div></div><span class="bar-val">0.8778</span></div>
+      <div class="bar-row"><span class="name">Fail recall</span><div class="bar-track"><div class="bar-fill mfill" data-w="9.40" style="background:linear-gradient(90deg,var(--teal),var(--sky))"></div></div><span class="bar-val">0.0940</span></div>
+      <div class="bar-row"><span class="name">Fail F1</span><div class="bar-track"><div class="bar-fill mfill" data-w="16.67" style="background:linear-gradient(90deg,var(--teal),var(--sky))"></div></div><span class="bar-val">0.1667</span></div>
+      <div style="font-size:11.5px;color:var(--dim);margin-top:10px">Interpreted as <b style="color:var(--muted)">signal adequacy under documented conditions</b> — not production performance. Chronological-split and leakage ablations are in <span style="font-family:var(--mono)">outputs/objective1_temporal_real/</span>.</div>
+    </div>
+    <div class="card">
+      <h3 style="color:var(--amber)">Random Forest <span style="font-size:10.5px;color:var(--dim);font-weight:400">· objective 2 baseline POC</span></h3>
+      <div class="hint">Starter implementation in src/poc — not the frozen snapshot</div>
+      <div class="bar-row"><span class="name">Status</span><div class="bar-track"><div class="bar-fill mfill" data-w="12" style="background:linear-gradient(90deg,var(--amber),var(--rose))"></div></div><span class="bar-val" style="font-size:10px">POC only</span></div>
+      <div class="bar-row"><span class="name">Code</span><div class="bar-track"><div class="bar-fill mfill" data-w="40" style="background:linear-gradient(90deg,var(--amber),var(--rose))"></div></div><span class="bar-val" style="font-size:10px">obj2_model_poc</span></div>
+      <div class="bar-row"><span class="name">Top Obj1 feat</span><div class="bar-track"><div class="bar-fill mfill" data-w="25" style="background:linear-gradient(90deg,var(--amber),var(--rose))"></div></div><span class="bar-val" style="font-size:10px">duration_sec</span></div>
+      <div class="bar-row"><span class="name">2nd Obj1 feat</span><div class="bar-track"><div class="bar-fill mfill" data-w="14" style="background:linear-gradient(90deg,var(--amber),var(--rose))"></div></div><span class="bar-val" style="font-size:10px">run_attempt</span></div>
+      <div style="font-size:11.5px;color:var(--dim);margin-top:10px">Full comparative modeling is Objective 2. Reported evidence for this artifact is the logistic baseline on the 3,000-run corpus.</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OBJECTIVE 3 ================= -->
+<section id="obj3" class="reveal">
+  <div class="sec-tag">Objective 3 · stability metric (POC)</div>
+  <h2>Try the stability score yourself</h2>
+  <p class="lead">This calculator runs the exact prototype formula from <span style="font-family:var(--mono);font-size:13px">src/poc/objective3_metric_poc.py</span> —
+  a weighted risk composite over the parameters objective 1 proved informative. Drag the sliders and watch the agent's recommendation change in real time.</p>
+  <div class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="card sliders">
+      <h3>Build parameters</h3>
+      <div class="hint">Simulating an incoming CI/CD run</div>
+      <label>Pipeline duration <output id="o-dur">420 s</output></label>
+      <input type="range" id="s-dur" min="0" max="3600" value="420" step="10">
+      <label>Total line changes (churn) <output id="o-chg">120</output></label>
+      <input type="range" id="s-chg" min="0" max="600" value="120" step="5">
+      <label>Files changed <output id="o-files">6</output></label>
+      <input type="range" id="s-files" min="0" max="30" value="6" step="1">
+      <label>Run attempt (retries) <output id="o-att">1</output></label>
+      <input type="range" id="s-att" min="1" max="3" value="1" step="1">
+      <div style="margin-top:18px;font-size:11px;color:var(--dim)">Risk composition</div>
+      <div class="risk-stack" id="risk-stack"></div>
+      <div style="font-size:10.5px;color:var(--dim);margin-top:8px;font-family:var(--mono)">risk = .20·duration + .25·churn + .25·files + .20·retries (+ .10·failure)</div>
+    </div>
+    <div class="card" style="text-align:center">
+      <h3>Build stability score</h3>
+      <div class="hint">1.0 = fully stable · thresholds from the objective-4 agent</div>
+      <svg id="gauge" width="260" height="170" viewBox="0 0 260 170"></svg>
+      <div id="score-val" style="font-family:var(--mono);font-size:34px;font-weight:800;margin-top:-8px">—</div>
+      <div class="action-badge" id="action-badge">—</div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= OBJECTIVE 4 ================= -->
+<section id="obj4" class="reveal">
+  <div class="sec-tag">Objective 4 · agentic orchestration (POC)</div>
+  <h2>The agentic loop, running live</h2>
+  <p class="lead">The portable orchestration architecture from Figure 2 of the manuscript, animated below. Press <b>Run simulation</b> to stream builds
+  through the full loop: harmonize → score → decide → act → learn. Decision rules and thresholds are lifted verbatim from <span style="font-family:var(--mono);font-size:13px">objective4_agentic_framework_poc.py</span>.</p>
+
+  <div class="card" style="margin-bottom:16px">
+    <h3>Portable agentic architecture</h3>
+    <div class="hint">Click any layer for its role · dashes show live data flow · a feedback loop closes actions back into data</div>
+    <div style="overflow-x:auto"><svg id="arch" width="100%" height="190" viewBox="0 0 1120 190" preserveAspectRatio="xMidYMid meet"></svg></div>
+    <div id="arch-detail">Select a layer of the architecture.</div>
+  </div>
+
+  <div class="sim-grid">
+    <div class="card">
+      <h3>Agent decision console</h3>
+      <div class="hint">Each incoming build is scored with the objective-3 metric, then routed by the objective-4 policy</div>
+      <div class="sim-controls">
+        <button class="btn primary" id="btn-run" onclick="toggleSim()">▶ Run simulation</button>
+        <button class="btn" onclick="setSpeed()" id="btn-speed">Speed: 1×</button>
+        <button class="btn" onclick="resetSim()">Reset</button>
+      </div>
+      <div class="console" id="console"><div class="ln t">— agent idle · press Run simulation —</div></div>
+    </div>
+    <div>
+      <div class="counter-grid">
+        <div class="counter"><div class="cv" id="c-total" style="color:var(--sky)">0</div><div class="cl">builds processed</div></div>
+        <div class="counter"><div class="cv" id="c-blocked" style="color:var(--red)">0</div><div class="cl">risky builds intercepted</div></div>
+        <div class="counter"><div class="cv" id="c-avg" style="color:var(--teal)">—</div><div class="cl">mean stability score</div></div>
+        <div class="counter"><div class="cv" id="c-saved" style="color:var(--amber)">0 min</div><div class="cl">est. CI time protected</div></div>
+      </div>
+      <div class="card" style="margin-top:12px">
+        <h3 style="font-size:13px">Action distribution</h3>
+        <div class="hint" style="margin-bottom:8px">Live run vs. the Objective 4 prototype batch (src/poc — not the frozen 3,000-run snapshot)</div>
+        <div id="dist"></div>
+        <div style="font-size:10.5px;color:var(--dim);margin-top:10px">Recorded batch: FAST_TRACK 190 · CAUTIONARY_RUN 61 · RUN_EXTENDED_TESTS 47 · BLOCK_AND_DIAGNOSE 2</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TRACEABILITY ================= -->
+<section id="trace" class="reveal">
+  <div class="sec-tag">Auditability</div>
+  <h2>Everything above traces to a file in this repository</h2>
+  <p class="lead">The manuscript's reproducibility argument, applied to this demo: every visual maps to source code or generated outputs in this repository.</p>
+  <div class="card" style="padding:6px 6px 10px">
+  <table>
+    <tr><th>Demo element</th><th>Backed by</th><th>Role</th></tr>
+    <tr><td>PRISMA funnel · taxonomy</td><td>Manuscript systematic-review section (397→142→47→18)</td><td>Review synthesis</td></tr>
+    <tr><td>Build stream &amp; schema</td><td><code>src/collect/collect_real_multirepo.py</code> · <code>src/schema/unify_schema.py</code></td><td>Collection + 20-field harmonization</td></tr>
+    <tr><td>Association chart · donut</td><td><code>outputs/objective1_real/parameter_association.csv</code> · <code>objective1_summary.md</code></td><td>Objective-1 statistical evidence</td></tr>
+    <tr><td>Logistic baseline</td><td><code>src/analysis/objective1_parameter_analysis.py</code></td><td>Frozen 3,000-run snapshot</td></tr>
+    <tr><td>Stability calculator</td><td><code>src/poc/objective3_metric_poc.py</code></td><td>Prototype metric (exact formula)</td></tr>
+    <tr><td>Agent console &amp; policy</td><td><code>src/poc/objective4_agentic_framework_poc.py</code></td><td>Orchestration thresholds</td></tr>
+    <tr><td>Architecture diagram</td><td><code>assets/figures/figure_agentic_cicd_architecture.png</code></td><td>Manuscript architecture figure</td></tr>
+    <tr><td>Source catalog</td><td><code>data/DATA_SOURCES_CATALOG.md</code></td><td>15 public repositories, 3,000 runs</td></tr>
+  </table>
+  </div>
+</section>
+
+<footer>
+  Agentic AI Driven Continuous Build Stability Prediction in the SDLC · Mahantesh M. Ambaljeri · thesis-poc interactive research demo<br>
+  Self-contained visualization — open <span style="font-family:var(--mono)">visualization/index.html</span> in any browser. No network required.
+</footer>
+
+<script>
+/* ================= data (from repository outputs) ================= */
+const ASSOC = [
+  {f:'duration_sec',       corr:0.2475, p:'4.2e-43', coef: 0.3615, rf:0.2475},
+  {f:'run_attempt',        corr:0.1413, p:'7.6e-15', coef: 0.0965, rf:0.1413},
+  {f:'commit_message_len', corr:0.0262, p:'0.15',    coef: 0.0919, rf:0.0262},
+  {f:'deletions',          corr:0.0129, p:'0.48',    coef:-0.1190, rf:0.0129},
+  {f:'total_changes',      corr:0.0114, p:'0.53',    coef: 0.0626, rf:0.0114},
+  {f:'additions',          corr:0.0103, p:'0.57',    coef: 0.1553, rf:0.0103},
+  {f:'files_changed',      corr:0.0001, p:'1.00',    coef:-0.0853, rf:0.0001},
+];
+const PRISMA = [
+  {n:397, label:'Identification', color:'#38bdf8', w:100, d:'<b>Identification — 397 records.</b><br>Scoped search of indexed scholarly sources (2017–2025) using keyword families around continuous integration/deployment, build failure prediction and build stability analytics. Everything that matched entered the funnel before any filtering.'},
+  {n:142, label:'Screening', color:'#14b8a6', w:74, d:'<b>Screening — 142 records.</b><br>De-duplication and consolidation: same DOI, same title–author–venue matches, and conference/journal version pairs collapsed to one representative record. Then title/abstract screening against the CI/CD build-outcome scope.'},
+  {n:47, label:'Eligibility', color:'#f59e0b', w:46, d:'<b>Full-text eligibility — 47 studies.</b><br>Full texts assessed against explicit inclusion criteria: CI/CD or build-outcome scope, empirical evidence, traceable dataset and parameter reporting, and enough methodological detail to synthesize.'},
+  {n:18, label:'Included', color:'#fb7185', w:26, d:'<b>Included — 18 primary studies.</b><br>The final synthesis corpus, positioned inside a 37-work bibliography (foundations, methodology anchors, emerging threads). Each study got a structured extraction record: dataset context, label definition, features, validation design, imbalance handling and threats.'},
+];
+const THREADS = [
+  {t:'Timeout builds', c:'#38bdf8', ref:'Weeraddana et al., TSE 2024'},
+  {t:'Systemic flaky tests', c:'#fb7185', ref:'Parry et al., EASE 2025 · Pontillo et al. 2021'},
+  {t:'LLM failure remediation', c:'#a78bfa', ref:'Xu et al. LogSage + two-stage, 2025'},
+  {t:'SoK: ML for CI', c:'#14b8a6', ref:'Arani et al., AIOps 2023'},
+  {t:'Compiler-error studies', c:'#f59e0b', ref:'Zhang et al., ESEC/FSE 2019'},
+  {t:'Test prioritization', c:'#34d399', ref:'Li et al., STVR 2024'},
+  {t:'ROC-AUC caveats', c:'#8fa0c2', ref:'Muschelli, J. Classification 2020'},
+];
+const TAXONOMY = [
+  {t:'Code & change', c:'#14b8a6', d:'Churn, files changed, modules touched, dependency and config edits, change intent (fix / feature / refactor). Larger, more scattered change sets raise failure risk — moderated by project maturity and test coverage.'},
+  {t:'Process & pipeline', c:'#38bdf8', d:'Pass/fail streaks, queue position, stage status, retries, cancellations, config volatility. Recent pipeline behavior often beats static code metrics for short-horizon prediction.'},
+  {t:'Test & log', c:'#f59e0b', d:'Test failure density, log template sequences, anomaly signals, flaky-test indicators. Sequence-aware features sharpen near-term failure detection — if logs exist, align to builds, and parse cleanly.'},
+  {t:'Developer & collaboration', c:'#a78bfa', d:'Contributor counts per window, committer experience, review lag, commit bursts. Useful but context-sensitive, and needs privacy governance before deployment.'},
+  {t:'Project context', c:'#fb7185', d:'Language stack, CI platform, repo age/size, branching and release cadence. Drives cross-platform variation — the main reason parameter weights do not transfer blindly between projects.'},
+];
+const FLOW = [
+  {t:'Collect', files:['collect/collect_real_multirepo.py','collect/github_actions_collector.py'],
+   d:'Pulls completed public GitHub Actions workflow runs from 15 OSS repositories and enriches each with commit-level stats. There is no silent synthetic fallback: if the API fails, collection fails. Optional TravisTorrent and GHArchive connectors remain available as extra sources.'},
+  {t:'Harmonize', files:['schema/unify_schema.py'],
+   d:'Maps every source into one 20-field canonical schema: build metadata (id, status, conclusion, timing), repository context (repo, branch, event), change metrics (additions, deletions, files changed) and commit signals. A single explicit rule derives the binary failure label: failure, cancelled, timed_out, action_required and startup_failure all count as failed.'},
+  {t:'Analyze', files:['analysis/objective1_parameter_analysis.py'],
+   d:'Point-biserial correlation between each numeric parameter and the failure label (with p-values), plus a standardized logistic regression on a held-out split as a signal-adequacy sanity check. Class distribution and failure-class metrics are reported explicitly — the review found accuracy-only reporting to be one of the field\u2019s main comparability failures.'},
+  {t:'Report', files:['analysis/export_objective1_report.py','analysis/build_objective1_paper_pack.py'],
+   d:'Exports the summary markdown, association CSVs, plots, an HTML report and a "paper pack" whose tables and figures flow directly into the manuscript. Every number in the journal traces back to a generated artifact — the paper\u2019s reproducibility argument made concrete.'},
+];
+const ARCH = [
+  {t:'Data Sources', c:'#38bdf8', d:'Commits, pull requests, CI logs, test reports, issue-tracker signals and pipeline metadata — the heterogeneous raw traces every CI/CD system already emits.'},
+  {t:'Data Engineering', c:'#14b8a6', d:'Ingestion, cleaning, unified schema harmonization, temporal windowing and imbalance diagnostics. The manuscript\u2019s core argument: this layer decides whether everything downstream is credible.'},
+  {t:'Modeling', c:'#f59e0b', d:'Candidate feature sets and benchmark-ready baselines (logistic, random forest here; comparative model design is the objective-2 paper). Temporal splits only — no shuffle leakage.'},
+  {t:'Decision & Metrics', c:'#a78bfa', d:'The build stability score and risk thresholds — the objective-3 prototype you used above. Formal metric design and validation is the objective-3 paper.'},
+  {t:'Agentic Orchestration', c:'#fb7185', d:'Diagnosis, recommendation and remediation planning with human oversight. Routes each build to an action based on its score — the objective-4 policy running in the console below.'},
+  {t:'CI/CD Actions', c:'#34d399', d:'Prioritization, selective testing, alerts, block-and-diagnose escalation. Outcomes feed back into the data layer, closing the continuous-learning loop.'},
+];
+
+/* ================= hero counters ================= */
+function animateCounters(){
+  document.querySelectorAll('[data-count]').forEach(el=>{
+    const target=+el.dataset.count, fmt=el.dataset.fmt, dur=1400, t0=performance.now();
+    function tick(t){
+      const k=Math.min((t-t0)/dur,1), v=Math.round(target*(1-Math.pow(1-k,3)));
+      el.textContent = fmt==='auc' ? (v/10000).toFixed(4) : fmt==='pct' ? (v/10000).toFixed(4) : v;
+      if(k<1) requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  });
+}
+animateCounters();
+
+/* ================= conveyor ================= */
+const conveyor=document.getElementById('conveyor');
+const repos=['pallets/flask','psf/requests','numpy/numpy','facebook/react','apache/airflow','microsoft/TypeScript'];
+function spawnChip(i){
+  const r=Math.random();
+  const cls=r<0.62?'pass':r<0.82?'warn':'fail';
+  const icon=cls==='pass'?'✓':cls==='warn'?'▲':'✗';
+  const el=document.createElement('span');
+  el.className='chip '+cls;
+  el.style.animationDelay=(i*1.8)+'s';
+  el.style.animationDuration=(8+Math.random()*4)+'s';
+  el.textContent=`${icon} ${repos[Math.floor(Math.random()*repos.length)]} #${1000+Math.floor(Math.random()*9000)}`;
+  conveyor.appendChild(el);
+}
+for(let i=0;i<5;i++) spawnChip(i);
+
+/* ================= pipeline flow ================= */
+const flowEl=document.getElementById('flow');
+FLOW.forEach((s,i)=>{
+  const d=document.createElement('div');
+  d.className='stage';
+  d.innerHTML=`<span class="num">PHASE ${i+1}</span><b>${s.t}</b>`+s.files.map(f=>`<code>src/${f}</code>`).join('');
+  d.onclick=()=>{document.querySelectorAll('.stage').forEach(x=>x.classList.remove('active'));d.classList.add('active');
+    document.getElementById('flow-detail').innerHTML=s.d;};
+  flowEl.appendChild(d);
+});
+
+/* ================= prisma funnel ================= */
+const funnel=document.getElementById('funnel');
+PRISMA.forEach((s,i)=>{
+  const d=document.createElement('div');
+  d.className='funnel-stage';
+  d.style.width=s.w+'%';
+  d.style.borderColor=s.color+'88';
+  d.style.background=s.color+'14';
+  d.innerHTML=`<span>${s.label}</span><span class="n" style="color:${s.color}">${s.n}</span>`;
+  d.onclick=()=>{document.getElementById('prisma-detail').innerHTML=s.d;};
+  funnel.appendChild(d);
+});
+
+/* ================= taxonomy ================= */
+const tax=document.getElementById('taxonomy');
+TAXONOMY.forEach(t=>{
+  const d=document.createElement('div');
+  d.className='tax';
+  d.style.borderColor=t.c+'77';
+  d.innerHTML=`<span style="color:${t.c}">●</span> ${t.t}`;
+  d.onmouseenter=d.onclick=()=>{document.getElementById('tax-detail').innerHTML=`<b style="color:${t.c}">${t.t}.</b> ${t.d}`;};
+  tax.appendChild(d);
+});
+const threadsEl=document.getElementById('threads');
+THREADS.forEach(t=>{
+  const d=document.createElement('div');
+  d.className='tax';
+  d.style.borderColor=t.c+'77';
+  d.title=t.ref;
+  d.innerHTML=`<span style="color:${t.c}">●</span> ${t.t} <span style="color:var(--dim);font-size:10px">· ${t.ref}</span>`;
+  threadsEl.appendChild(d);
+});
+
+/* ================= association chart ================= */
+const chartEl=document.getElementById('assoc-chart');
+function sig(p){
+  const v=parseFloat(p);
+  if(v<0.001) return ['p < 0.001','#34d399'];
+  if(v<0.05) return ['p < 0.05','#f59e0b'];
+  return ['n.s.','#5c6d92'];
+}
+function setChart(mode,btn){
+  if(btn){btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('on'));btn.classList.add('on');}
+  chartEl.innerHTML='';
+  const data=[...ASSOC].sort((a,b)=>Math.abs(b[mode==='corr'?'corr':mode==='coef'?'coef':'rf'])-Math.abs(a[mode==='corr'?'corr':mode==='coef'?'coef':'rf']));
+  const max=mode==='corr'?0.30:mode==='coef'?0.40:0.30;
+  data.forEach(d=>{
+    const val=mode==='corr'?d.corr:mode==='coef'?d.coef:d.rf;
+    const neg=val<0;
+    const row=document.createElement('div');
+    row.className='bar-row';
+    const [st,sc]=sig(d.p);
+    const grad=neg?'linear-gradient(90deg,#fb7185,#f87171)':'linear-gradient(90deg,#14b8a6,#38bdf8)';
+    row.innerHTML=`<span class="name">${d.f}</span>
+      <div class="bar-track" title="point-biserial p-value: ${d.p}"><div class="bar-fill" style="background:${grad}" data-w="${Math.abs(val)/max*100}"></div></div>
+      <span class="bar-val">${val.toFixed(3)}${mode==='corr'?`<span class="sig" style="background:${sc}22;color:${sc}">${st}</span>`:''}</span>`;
+    chartEl.appendChild(row);
+  });
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+    chartEl.querySelectorAll('.bar-fill').forEach(b=>b.style.width=b.dataset.w+'%');
+  }));
+}
+setChart('corr');
+
+/* ================= donut ================= */
+(function(){
+  const svg=document.getElementById('donut'),C=110,R=78,SW=30;
+  const circ=2*Math.PI*R, failFrac=389/3000;
+  svg.innerHTML=`
+   <circle cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#233156" stroke-width="${SW}"/>
+   <circle id="d-pass" cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#34d399" stroke-width="${SW}"
+     stroke-dasharray="0 ${circ}" stroke-linecap="butt" transform="rotate(-90 ${C} ${C})" style="transition:stroke-dasharray 1.4s ease"/>
+   <circle id="d-fail" cx="${C}" cy="${C}" r="${R}" fill="none" stroke="#f87171" stroke-width="${SW}"
+     stroke-dasharray="0 ${circ}" transform="rotate(${-90+360*(1-failFrac)} ${C} ${C})" style="transition:stroke-dasharray 1.4s ease .3s"/>
+   <text x="${C}" y="${C-4}" text-anchor="middle" fill="#e8edf7" font-size="26" font-weight="800">12.97%</text>
+   <text x="${C}" y="${C+18}" text-anchor="middle" fill="#8fa0c2" font-size="10.5">failure rate</text>`;
+  setTimeout(()=>{
+    svg.querySelector('#d-pass').setAttribute('stroke-dasharray',`${circ*(1-failFrac)} ${circ}`);
+    svg.querySelector('#d-fail').setAttribute('stroke-dasharray',`${circ*failFrac} ${circ}`);
+  },400);
+})();
+
+/* ================= objective 3 calculator ================= */
+const clip=(v,lo,hi)=>Math.min(Math.max(v,lo),hi);
+function stability(dur,chg,files,att){
+  // exact formula from src/poc/objective3_metric_poc.py (is_failed term = 0 pre-build)
+  const risk=0.20*clip(dur/3600,0,1)+0.25*clip(chg/500,0,1)+0.25*clip(files/25,0,1)+0.20*clip(att-1,0,1);
+  return {score:clip(1-risk,0,1),parts:[0.20*clip(dur/3600,0,1),0.25*clip(chg/500,0,1),0.25*clip(files/25,0,1),0.20*clip(att-1,0,1)]};
+}
+function recommend(score,chg,files){
+  // exact policy from src/poc/objective4_agentic_framework_poc.py
+  if(score<0.35) return {k:'BLOCK_AND_DIAGNOSE',c:'#f87171',d:'Trigger deep log triage and mandatory reviewer approval.'};
+  if(score<0.55) return {k:'RUN_EXTENDED_TESTS',c:'#f59e0b',d:'Prioritize integration / regression suites before merge.'};
+  if(chg>300||files>15) return {k:'CAUTIONARY_RUN',c:'#38bdf8',d:'Run standard pipeline plus targeted tests on touched modules.'};
+  return {k:'FAST_TRACK',c:'#34d399',d:'Standard CI run with normal monitoring.'};
+}
+const gauge=document.getElementById('gauge');
+function drawGauge(score){
+  const cx=130,cy=150,R2=105,start=Math.PI,end=Math.PI*(1-score);
+  function arcPath(a0,a1,r){
+    const x0=cx+r*Math.cos(a0),y0=cy-r*Math.sin(a0),x1=cx+r*Math.cos(a1),y1=cy-r*Math.sin(a1);
+    return `M ${x0} ${y0} A ${r} ${r} 0 ${(a0-a1)>Math.PI?1:0} 1 ${x1} ${y1}`;
+  }
+  const col=score<0.35?'#f87171':score<0.55?'#f59e0b':'#34d399';
+  // threshold ticks at 0.35 and 0.55
+  const ticks=[0.35,0.55].map(t=>{
+    const a=Math.PI*(1-t),x0=cx+(R2-14)*Math.cos(a),y0=cy-(R2-14)*Math.sin(a),x1=cx+(R2+8)*Math.cos(a),y1=cy-(R2+8)*Math.sin(a);
+    return `<line x1="${x0}" y1="${y0}" x2="${x1}" y2="${y1}" stroke="#5c6d92" stroke-width="1.5" stroke-dasharray="3 2"/>
+      <text x="${cx+(R2+22)*Math.cos(a)}" y="${cy-(R2+22)*Math.sin(a)+3}" text-anchor="middle" fill="#5c6d92" font-size="9">${t}</text>`;
+  }).join('');
+  gauge.innerHTML=`
+    <path d="${arcPath(Math.PI,0,R2)}" fill="none" stroke="#233156" stroke-width="17" stroke-linecap="round"/>
+    <path d="${arcPath(Math.PI,end,R2)}" fill="none" stroke="${col}" stroke-width="17" stroke-linecap="round" style="filter:drop-shadow(0 0 6px ${col}66)"/>
+    ${ticks}
+    <text x="30" y="168" fill="#5c6d92" font-size="9">0.0 unstable</text>
+    <text x="228" y="168" fill="#5c6d92" font-size="9" text-anchor="end">1.0 stable</text>`;
+  return col;
+}
+const RISKCOLS=['#38bdf8','#14b8a6','#a78bfa','#fb7185'];
+const RISKLBL=['duration','churn','files','retries'];
+function updateCalc(){
+  const dur=+document.getElementById('s-dur').value, chg=+document.getElementById('s-chg').value,
+        files=+document.getElementById('s-files').value, att=+document.getElementById('s-att').value;
+  document.getElementById('o-dur').textContent=dur+' s';
+  document.getElementById('o-chg').textContent=chg;
+  document.getElementById('o-files').textContent=files;
+  document.getElementById('o-att').textContent=att;
+  const {score,parts}=stability(dur,chg,files,att);
+  const col=drawGauge(score);
+  const sv=document.getElementById('score-val');
+  sv.textContent=score.toFixed(3); sv.style.color=col;
+  const stack=document.getElementById('risk-stack');
+  const totalRisk=parts.reduce((a,b)=>a+b,0);
+  stack.innerHTML=parts.map((p,i)=>`<div style="width:${p*100}%;background:${RISKCOLS[i]}" title="${RISKLBL[i]} risk: ${p.toFixed(3)}">${p>0.045?RISKLBL[i]:''}</div>`).join('')
+    +`<div style="width:${(1-totalRisk)*100}%;background:rgba(52,211,153,.18);color:#34d399">${(1-totalRisk)>0.12?'stability headroom':''}</div>`;
+  const rec=recommend(score,chg,files);
+  const badge=document.getElementById('action-badge');
+  badge.style.borderColor=rec.c; badge.style.background=rec.c+'14'; badge.style.color=rec.c;
+  badge.innerHTML=`⚡ ${rec.k}<div class="action-desc" style="color:${rec.c}">${rec.d}</div>`;
+}
+['s-dur','s-chg','s-files','s-att'].forEach(id=>document.getElementById(id).addEventListener('input',updateCalc));
+updateCalc();
+
+/* ================= architecture svg ================= */
+(function(){
+  const svg=document.getElementById('arch');
+  const W=1120,BW=150,BH=64,GAP=(W-40-6*BW)/5,Y=42;
+  let html='';
+  ARCH.forEach((n,i)=>{
+    const x=20+i*(BW+GAP);
+    if(i<5){
+      const x1=x+BW,x2=x+BW+GAP;
+      html+=`<line class="dashflow" x1="${x1}" y1="${Y+BH/2}" x2="${x2-8}" y2="${Y+BH/2}" stroke="${n.c}" stroke-width="2"/>
+        <polygon points="${x2-8},${Y+BH/2-5} ${x2},${Y+BH/2} ${x2-8},${Y+BH/2+5}" fill="${n.c}"/>`;
+    }
+    html+=`<g class="arch-node" data-i="${i}">
+      <rect x="${x}" y="${Y}" width="${BW}" height="${BH}" rx="12" fill="${n.c}18" stroke="${n.c}" stroke-width="1.5"/>
+      <text x="${x+BW/2}" y="${Y+29}" text-anchor="middle" fill="#e8edf7" font-size="12.5" font-weight="700" font-family="inherit">${n.t.split(' ')[0]}</text>
+      <text x="${x+BW/2}" y="${Y+45}" text-anchor="middle" fill="#8fa0c2" font-size="10.5">${n.t.split(' ').slice(1).join(' ')||''}</text>
+    </g>`;
+  });
+  // feedback loop
+  const xLast=20+5*(BW+GAP)+BW/2, xFirst=20+BW/2;
+  html+=`<path class="dashflow" d="M ${xLast} ${Y+BH} C ${xLast} ${Y+BH+56}, ${xFirst} ${Y+BH+56}, ${xFirst} ${Y+BH+4}" fill="none" stroke="#34d399" stroke-width="1.8"/>
+    <polygon points="${xFirst-5},${Y+BH+12} ${xFirst},${Y+BH+2} ${xFirst+5},${Y+BH+12}" fill="#34d399"/>
+    <text x="${W/2}" y="${Y+BH+50}" text-anchor="middle" fill="#34d399" font-size="10.5" font-family="var(--mono)">feedback loop · outcomes retrain data &amp; models</text>`;
+  svg.innerHTML=html;
+  svg.querySelectorAll('.arch-node').forEach(g=>{
+    g.addEventListener('click',()=>{
+      const n=ARCH[+g.dataset.i];
+      document.getElementById('arch-detail').innerHTML=`<b style="color:${n.c}">${n.t}.</b> ${n.d}`;
+    });
+  });
+})();
+
+/* ================= agent simulation ================= */
+let simTimer=null,speed=1,total=0,blocked=0,scoreSum=0,savedMin=0;
+const counts={FAST_TRACK:0,CAUTIONARY_RUN:0,RUN_EXTENDED_TESTS:0,BLOCK_AND_DIAGNOSE:0};
+const BATCH={FAST_TRACK:190,CAUTIONARY_RUN:61,RUN_EXTENDED_TESTS:47,BLOCK_AND_DIAGNOSE:2};
+const ACOL={FAST_TRACK:'#34d399',CAUTIONARY_RUN:'#38bdf8',RUN_EXTENDED_TESTS:'#f59e0b',BLOCK_AND_DIAGNOSE:'#f87171'};
+const consoleEl=document.getElementById('console');
+function log(html,cls=''){
+  const d=document.createElement('div');d.className='ln '+cls;d.innerHTML=html;
+  consoleEl.appendChild(d);
+  while(consoleEl.children.length>140)consoleEl.removeChild(consoleEl.firstChild);
+  consoleEl.scrollTop=consoleEl.scrollHeight;
+}
+function ts(){const d=new Date();return `<span class="t">[${d.toTimeString().slice(0,8)}]</span>`;}
+function genBuild(){
+  // distribution shaped like the synthetic generator in github_actions_collector.py,
+  // plus a rare pathological case so the BLOCK path is observable in short demos
+  const r=Math.random();
+  const patho=r<0.07, heavy=!patho&&r<0.30;
+  return {
+    repo:repos[Math.floor(Math.random()*repos.length)],
+    id:100000+Math.floor(Math.random()*99999),
+    dur:patho?2600+Math.random()*1000:heavy?900+Math.random()*2400:80+Math.random()*900,
+    chg:patho?480+Math.random()*120:heavy?250+Math.random()*350:5+Math.random()*220,
+    files:patho?22+Math.floor(Math.random()*8):heavy?12+Math.floor(Math.random()*18):1+Math.floor(Math.random()*9),
+    att:patho?2:Math.random()<0.12?2:1,
+  };
+}
+function updateDist(){
+  const el=document.getElementById('dist');
+  const liveMax=Math.max(1,...Object.values(counts));
+  el.innerHTML=Object.keys(counts).map(k=>{
+    const batchPct=BATCH[k]/300*100;
+    return `<div class="dist-row"><span style="color:${ACOL[k]}">${k}</span>
+      <div class="dist-track" title="live: ${counts[k]} · recorded batch: ${BATCH[k]}/300">
+        <div class="dist-fill" style="width:${counts[k]/liveMax*100}%;background:${ACOL[k]}"></div>
+      </div><span>${counts[k]}</span></div>
+      <div class="dist-row" style="margin-top:-4px;opacity:.45"><span style="font-size:9px;color:var(--dim)">batch baseline</span>
+      <div class="dist-track" style="height:5px"><div class="dist-fill" style="width:${batchPct}%;background:${ACOL[k]}"></div></div>
+      <span style="font-size:9px">${BATCH[k]}</span></div>`;
+  }).join('');
+}
+updateDist();
+function step(){
+  const b=genBuild();
+  const {score}=stability(b.dur,b.chg,b.files,b.att);
+  const rec=recommend(score,b.chg,b.files);
+  counts[rec.k]++;total++;scoreSum+=score;
+  log(`${ts()} <span class="inf">ingest</span> ${b.repo} <span class="t">#${b.id}</span> · dur=${Math.round(b.dur)}s files=${b.files} churn=${Math.round(b.chg)} attempt=${b.att}`);
+  log(`${ts()} <span class="agent">agent</span> harmonized → 20-field schema · stability_score=<b style="color:${score<0.35?'#f87171':score<0.55?'#f59e0b':'#34d399'}">${score.toFixed(3)}</b>`);
+  const cls=rec.k==='FAST_TRACK'?'ok':rec.k==='BLOCK_AND_DIAGNOSE'?'bad':'wrn';
+  log(`${ts()} <span class="agent">agent</span> decision → <span class="${cls}">${rec.k}</span> · ${rec.d.toLowerCase()}`,'');
+  if(rec.k==='BLOCK_AND_DIAGNOSE'){blocked++;savedMin+=Math.round(b.dur/60)+18;
+    log(`${ts()} <span class="bad">⛔ intercepted</span> — deep log triage queued, reviewer approval requested`,'');}
+  if(rec.k==='RUN_EXTENDED_TESTS'){savedMin+=6;}
+  document.getElementById('c-total').textContent=total;
+  document.getElementById('c-blocked').textContent=blocked;
+  document.getElementById('c-avg').textContent=(scoreSum/total).toFixed(3);
+  document.getElementById('c-saved').textContent=savedMin+' min';
+  updateDist();
+}
+function toggleSim(){
+  const btn=document.getElementById('btn-run');
+  if(simTimer){clearInterval(simTimer);simTimer=null;btn.textContent='▶ Run simulation';btn.classList.add('primary');
+    log(`${ts()} <span class="t">— simulation paused —</span>`);return;}
+  if(total===0){
+    log(`${ts()} <span class="inf">boot</span> agentic orchestration POC · policy: objective4_agentic_framework_poc.py`);
+    log(`${ts()} <span class="inf">boot</span> metric: objective3 stability composite · thresholds 0.35 / 0.55`);
+    log(`${ts()} <span class="ok">ready</span> watching CI/CD event stream…`);
+  }
+  simTimer=setInterval(step,1500/speed);
+  btn.textContent='⏸ Pause';btn.classList.remove('primary');
+}
+function setSpeed(){
+  speed=speed===1?2:speed===2?4:1;
+  document.getElementById('btn-speed').textContent=`Speed: ${speed}×`;
+  if(simTimer){clearInterval(simTimer);simTimer=setInterval(step,1500/speed);}
+}
+function resetSim(){
+  if(simTimer){clearInterval(simTimer);simTimer=null;document.getElementById('btn-run').textContent='▶ Run simulation';document.getElementById('btn-run').classList.add('primary');}
+  total=0;blocked=0;scoreSum=0;savedMin=0;
+  Object.keys(counts).forEach(k=>counts[k]=0);
+  consoleEl.innerHTML='<div class="ln t">— agent idle · press Run simulation —</div>';
+  document.getElementById('c-total').textContent='0';
+  document.getElementById('c-blocked').textContent='0';
+  document.getElementById('c-avg').textContent='—';
+  document.getElementById('c-saved').textContent='0 min';
+  updateDist();
+}
+
+/* ================= reveal on scroll + metric bars ================= */
+const io=new IntersectionObserver(es=>es.forEach(e=>{
+  if(e.isIntersecting){
+    e.target.classList.add('in');
+    e.target.querySelectorAll('.mfill').forEach(b=>b.style.width=b.dataset.w+'%');
+    io.unobserve(e.target);
+  }
+}),{threshold:.12});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

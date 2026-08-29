@@ -1,0 +1,20 @@
+{
+  "pallets/flask": {
+    "url": "https://github.com/pallets/flask",
+    "api_endpoint": "https://api.github.com/repos/pallets/flask/actions/runs",
+    "rows": 60,
+    "failure_rate": 0.1,
+    "window_start": "2026-08-09 00:10:22+00:00",
+    "window_end": "2026-08-28 02:40:26+00:00",
+    "collected_at_utc": "2026-08-28T14:58:39.478909+00:00"
+  },
+  "psf/requests": {
+    "url": "https://github.com/psf/requests",
+    "api_endpoint": "https://api.github.com/repos/psf/requests/actions/runs",
+    "rows": 60,
+    "failure_rate": 0.2,
+    "window_start": "2026-08-14 00:13:03+00:00",
+    "window_end": "2026-08-28 02:34:16+00:00",
+    "collected_at_utc": "2026-08-28T14:58:45.092583+00:00"
+  }
+}

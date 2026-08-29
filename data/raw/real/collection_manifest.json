@@ -1,0 +1,137 @@
+{
+  "pallets/flask": {
+    "url": "https://github.com/pallets/flask",
+    "api_endpoint": "https://api.github.com/repos/pallets/flask/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.47,
+    "window_start": "2026-07-02 06:56:19+00:00",
+    "window_end": "2026-08-28 02:40:26+00:00",
+    "collected_at_utc": "2026-08-28T15:01:41.777710+00:00"
+  },
+  "psf/requests": {
+    "url": "https://github.com/psf/requests",
+    "api_endpoint": "https://api.github.com/repos/psf/requests/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.245,
+    "window_start": "2026-06-15 00:30:33+00:00",
+    "window_end": "2026-08-26 00:04:36+00:00",
+    "collected_at_utc": "2026-08-28T15:01:57.392742+00:00"
+  },
+  "numpy/numpy": {
+    "url": "https://github.com/numpy/numpy",
+    "api_endpoint": "https://api.github.com/repos/numpy/numpy/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.005,
+    "window_start": "2026-08-27 19:28:42+00:00",
+    "window_end": "2026-08-28 13:32:44+00:00",
+    "collected_at_utc": "2026-08-28T15:02:09.685289+00:00"
+  },
+  "pandas-dev/pandas": {
+    "url": "https://github.com/pandas-dev/pandas",
+    "api_endpoint": "https://api.github.com/repos/pandas-dev/pandas/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.085,
+    "window_start": "2026-08-27 20:34:27+00:00",
+    "window_end": "2026-08-28 15:00:33+00:00",
+    "collected_at_utc": "2026-08-28T15:02:58.199176+00:00"
+  },
+  "scikit-learn/scikit-learn": {
+    "url": "https://github.com/scikit-learn/scikit-learn",
+    "api_endpoint": "https://api.github.com/repos/scikit-learn/scikit-learn/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.045,
+    "window_start": "2026-08-28 08:50:00+00:00",
+    "window_end": "2026-08-28 14:51:18+00:00",
+    "collected_at_utc": "2026-08-28T15:03:23.452357+00:00"
+  },
+  "fastapi/fastapi": {
+    "url": "https://github.com/fastapi/fastapi",
+    "api_endpoint": "https://api.github.com/repos/fastapi/fastapi/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.085,
+    "window_start": "2026-08-26 17:39:19+00:00",
+    "window_end": "2026-08-28 12:31:30+00:00",
+    "collected_at_utc": "2026-08-28T15:03:41.054845+00:00"
+  },
+  "apache/airflow": {
+    "url": "https://github.com/apache/airflow",
+    "api_endpoint": "https://api.github.com/repos/apache/airflow/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.085,
+    "window_start": "2026-08-21 16:54:53+00:00",
+    "window_end": "2026-08-28 12:56:39+00:00",
+    "collected_at_utc": "2026-08-28T15:04:36.302258+00:00"
+  },
+  "facebook/react": {
+    "url": "https://github.com/facebook/react",
+    "api_endpoint": "https://api.github.com/repos/facebook/react/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.025,
+    "window_start": "2026-08-26 10:10:18+00:00",
+    "window_end": "2026-08-28 15:03:04+00:00",
+    "collected_at_utc": "2026-08-28T15:05:09.008922+00:00"
+  },
+  "vuejs/core": {
+    "url": "https://github.com/vuejs/core",
+    "api_endpoint": "https://api.github.com/repos/vuejs/core/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.08,
+    "window_start": "2026-08-26 03:36:05+00:00",
+    "window_end": "2026-08-28 11:47:26+00:00",
+    "collected_at_utc": "2026-08-28T15:05:45.324000+00:00"
+  },
+  "axios/axios": {
+    "url": "https://github.com/axios/axios",
+    "api_endpoint": "https://api.github.com/repos/axios/axios/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.04,
+    "window_start": "2026-08-13 17:57:02+00:00",
+    "window_end": "2026-08-28 00:23:52+00:00",
+    "collected_at_utc": "2026-08-28T15:06:10.936416+00:00"
+  },
+  "microsoft/TypeScript": {
+    "url": "https://github.com/microsoft/TypeScript",
+    "api_endpoint": "https://api.github.com/repos/microsoft/TypeScript/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.095,
+    "window_start": "2026-08-26 17:15:15+00:00",
+    "window_end": "2026-08-28 10:42:34+00:00",
+    "collected_at_utc": "2026-08-28T15:07:08.699999+00:00"
+  },
+  "spring-projects/spring-boot": {
+    "url": "https://github.com/spring-projects/spring-boot",
+    "api_endpoint": "https://api.github.com/repos/spring-projects/spring-boot/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.07,
+    "window_start": "2026-08-25 21:20:02+00:00",
+    "window_end": "2026-08-28 12:36:07+00:00",
+    "collected_at_utc": "2026-08-28T15:07:47.219779+00:00"
+  },
+  "grafana/grafana": {
+    "url": "https://github.com/grafana/grafana",
+    "api_endpoint": "https://api.github.com/repos/grafana/grafana/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.025,
+    "window_start": "2026-07-18 18:22:26+00:00",
+    "window_end": "2026-07-19 05:59:51+00:00",
+    "collected_at_utc": "2026-08-28T15:08:00.703247+00:00"
+  },
+  "tokio-rs/tokio": {
+    "url": "https://github.com/tokio-rs/tokio",
+    "api_endpoint": "https://api.github.com/repos/tokio-rs/tokio/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.08,
+    "window_start": "2026-08-15 03:23:58+00:00",
+    "window_end": "2026-08-28 10:28:34+00:00",
+    "collected_at_utc": "2026-08-28T15:08:39.274234+00:00"
+  },
+  "opencv/opencv": {
+    "url": "https://github.com/opencv/opencv",
+    "api_endpoint": "https://api.github.com/repos/opencv/opencv/actions/runs",
+    "rows": 200,
+    "failure_rate": 0.51,
+    "window_start": "2026-08-13 12:33:38+00:00",
+    "window_end": "2026-08-28 10:05:41+00:00",
+    "collected_at_utc": "2026-08-28T15:10:22.260592+00:00"
+  }
+}
